@@ -1,16 +1,12 @@
-
 <?php
-
-
 class Mmjmenu {
     private $domain = 'https://mmjmenu.com/api/v1';
 
     private $active_api_key;
     private $active_domain;
 
-    private $username;
     private $password;
-  
+
     public function __construct($api_key, $active_domain = null, $active_api_key = null) {
         $this->setActiveDomain($this->domain, $api_key);
     }
@@ -18,15 +14,14 @@ class Mmjmenu {
     public function setActiveDomain($active_domain, $active_api_key) {
         $this->active_domain = $active_domain;
         $this->active_api_key = $active_api_key;
-        $this->username = $this->active_api_key;
-        $this->password = 'x';
+        $this->password = 'x';//wtf
     }
-  
+
     private function sendRequest($uri, $method = 'GET', $data = '') {
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, "https://mmjmenu.com/api/v1" . $uri);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_URL, $this->active_domain . $uri);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 1);
@@ -34,23 +29,18 @@ class Mmjmenu {
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json',
             'Accept: application/json'
-        ));
+            ));
 
-        curl_setopt($ch, CURLOPT_USERPWD, $this->username . ':' . $this->password);
+        curl_setopt($ch, CURLOPT_USERPWD, $this->active_api_key . ':' . $this->password);
 
         $method = strtoupper($method);
-        if($method == 'POST')
-        {
+        if($method == 'POST') {
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        }
-        else if ($method == 'PUT')
-        {
+        } else if ($method == 'PUT') {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        }
-        else if($method != 'GET')
-        {
+        } else if($method != 'GET') {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         }
 
@@ -67,11 +57,11 @@ class Mmjmenu {
         curl_close($ch);
         
         if ($curl_error) {
-            //print('ERROR');
-        }
+           $result->response = json_encode(array('error'=>$curl_error));
+       }
 
-        return $result;
-    }
+       return $result;
+   }
 
     /****************************************************
     ********************* MENU ITEMS ********************
@@ -80,13 +70,14 @@ class Mmjmenu {
     public function menuItems() {
         $base_url = '/menu_items';
         $menuItems = $this->sendRequest($base_url);
-        return $menuItems->response;
+        return json_encode($menuItems);
     }
     
     public function menuItem($id) {
         $base_url = "/menu_items/$id";
         $menuItem = $this->sendRequest($base_url);
-        return $menuItem->response;
+        return json_encode($menuItem);
     }
+
 }
 ?>
