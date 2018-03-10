@@ -1,21 +1,70 @@
 ## Setup
-    require '/home/justin/apps/php/mmjmenu-php-client/Mmjmenu.php';
+    require 'Mmjmenu.php';
     $client = new Mmjmenu('API_KEY');
     
 ## Examples
 
 ### List Menu Items
-    $menuItems      = $client->menuItems();
-    $menuItems      = json_decode($menuItems, true);
-    
-    foreach($menuItems['menu_items'] as $item){
-        print($item['name']);
+    <?php
+    require 'Mmjmenu.php';
+    $s = "---";
+
+    // Your API Key
+    $client = new Mmjmenu('API_KEY');
+
+    // Get the full response
+    $response = json_decode($client->menuItems(), true);
+    // echo json_encode($response, true);
+
+    // Extract the part we want
+    $menuItems = json_decode($response['response'], true);
+
+
+    foreach($menuItems['menu_items'] as $item) {
+        echo $item['id'].": ".$item['name'] . "\n";
+        echo $item['body_html']."\n";
+        echo "Pictures:\n";
+        foreach($item['picture'] as $size=>$url) {
+            echo $s." ".$size.": ".$url."\n";
+        }
+        echo "Prices:\n";
+        foreach($item['price'] as $weight=>$price) {
+            echo $s." ".$weight.": ".$price."\n";
+        }
+        
+        echo "All Possible Data:\n";
+        echo print_r($item, true);
+        echo "\n\n$s$s$s$s\n";
     }
 
 ### Get a Menu Item
-    $menuItem      = $client->menuItem('123')
-    $menuItem      = json_decode($menuItem, true);
-    $menuItem      = $menuItem['menu_item'];
+    <?php
+    require 'Mmjmenu.php';
+    $s = "---";
 
-    print($menuItem['name']);
+    // Your API Key
+    $client = new Mmjmenu('API_KEY');
+
+    // Get the full response
+    $response = json_decode($client->menuItem('123'), true);
+    // echo json_encode($response, true);
+
+    // Extract the part we want
+    $menuItems = json_decode($response['response'], true);
+    // echo json_encode($menuItems, true);
+
+    $item = $menuItems['menu_item'];
+    echo $item['id'].": ".$item['name'] . "\n";
+    echo $item['body_html']."\n";
+    echo "Pictures:\n";
+    foreach($item['picture'] as $size=>$url) {
+        echo $s." ".$size.": ".$url."\n";
+    }
+    echo "Prices:\n";
+    foreach($item['price'] as $weight=>$price) {
+        echo $s." ".$weight.": ".$price."\n";
+    }
+
+    echo "All Possible Data:\n";
+    echo print_r($item, true);
 
